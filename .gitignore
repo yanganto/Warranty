@@ -1,0 +1,3 @@
+.direnv
+sui-move.log.*
+build
