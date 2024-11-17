@@ -3,6 +3,7 @@ module warranty::warranty;
 
 // === Imports ===
 use std::string::{Self, String};
+use sui::clock::{Self, Clock};
 
 
 // === Errors ===
@@ -22,7 +23,8 @@ public struct BrandOwnerCap has key {
 public struct Card has key, store {
     id: UID,
     product_serise_number: String,
-    // TODO: add warranty expiring date
+    // The warranty expire timestamp in ms
+    warranty_expiring_at: u64,
 }
 
 // Set up a Brand, so the brand owner, known as publisher, can issue warranty for the brand after init
@@ -40,15 +42,15 @@ fun init(ctx: &mut TxContext) {
 }
 
 // === Method Aliases ===
-public use fun card_valid as Card.valid;
+public use fun verify_card as Card.verify;
 
 // === Public-View Functions ===
 // Check the card still valid
-public fun card_valid(
-    _card: &Card,
+public fun verify_card(
+    card: &Card,
+    now: &Clock,
 ): bool {
-    // TODO: check warranty expiring date
-    true
+    card.warranty_expiring_at > clock::timestamp_ms(now)
 }
 
 // === Admin Functions ===
@@ -57,7 +59,8 @@ public fun issue(
     brand_owner_cap: &BrandOwnerCap,
     product_serise_number: String,
     buyer: address,
-    ctx: &mut TxContext
+    ctx: &mut TxContext,
+    warranty_time_in_ms: u64
 ) {
     assert!(warranty.brand_owner == object::id(brand_owner_cap), ENotBrandOnwer);
     assert!(!string::is_empty(&product_serise_number), EEmptyName);
@@ -65,6 +68,7 @@ public fun issue(
     let warranty_card = Card {
         id: object::new(ctx),
         product_serise_number,
+        warranty_expiring_at: ctx.epoch_timestamp_ms() + warranty_time_in_ms
     };
 
     transfer::transfer(warranty_card, buyer);
