@@ -4,5 +4,5 @@ A product warranty into a Sui digital object. A warranty card owner can easiler 
 
 The following features will provide.
 - [x] Warranty expiring feature
-- [ ] Repairing tracking (Every repairing record will become a dynamic object field attach on the warranty card)
+- [x] Repairing tracking (Every repairing record will become a dynamic object field attach on the warranty card)
 - [ ] BrandOwner can change the display of the warranty card
