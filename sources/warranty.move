@@ -123,3 +123,60 @@ public fun issue(
 
     transfer::transfer(warranty_card, buyer);
 }
+
+#[test]
+fun test_issued_warranty_card_can_transfer() {
+    use sui::test_scenario;
+    use std::debug;
+
+    let anyone: address = @0xAAAA;
+    let brand_owner: address = @0xBBBB;
+    let first_buyer: address = @0x0001;
+    let second_buyer: address = @0x0002;
+    let mut scenario = test_scenario::begin(brand_owner);
+    {
+        init(scenario.ctx());
+    };
+
+    scenario.next_tx(brand_owner);
+    {
+        // warranty for a brand is created globally
+        let warranty = scenario.take_shared<Warranty>();
+        debug::print(&warranty);
+
+        // brand_owner will have cap after init contract
+        let cap = scenario.take_from_sender<BrandOwnerCap>();
+        debug::print(&cap);
+
+        warranty.issue(&cap, string::utf8(b"SN:1234"), first_buyer, 50000, scenario.ctx());
+
+        test_scenario::return_shared(warranty);
+        scenario.return_to_sender(cap);
+
+    };
+
+    scenario.next_tx(anyone);
+    {
+        // anyone can check the first buyer have the warranty card
+        let warranty_card = scenario.take_from_address<Card>(first_buyer);
+        debug::print(&warranty_card.id);
+        test_scenario::return_to_address(first_buyer, warranty_card);
+    };
+
+    scenario.next_tx(first_buyer);
+    {
+        // first buyer can transfer the warranty card when sell the product to second buyer in real world
+        let warranty_card = scenario.take_from_address<Card>(first_buyer);
+        sui::transfer::public_transfer(warranty_card, second_buyer);
+    };
+
+    scenario.next_tx(anyone);
+    {
+        // anyone can check the second buyer have the warranty card
+        let warranty_card = scenario.take_from_address<Card>(second_buyer);
+        debug::print(&warranty_card.id);
+        test_scenario::return_to_address(second_buyer, warranty_card);
+    };
+
+    scenario.end();
+}
