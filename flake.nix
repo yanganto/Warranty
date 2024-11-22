@@ -30,15 +30,8 @@
   };
 
   outputs = { self, nixpkgs, rust-overlay, flake-utils, sui-flake, ... }:
-    flake-utils.lib.eachDefaultSystem (system:
-      let
-        currentSystem = if system == "dev" then builtins.currentSystem else system;
-      in
-      {
-        devShells = {
-          dev = sui-flake.devShells."${currentSystem}".slim;
-          default = sui-flake.devShells."${system}".slim;
-        };
+    flake-utils.lib.eachDefaultSystem (system: {
+        devShells.default = sui-flake.devShells."${system}".slim;
       }
     );
 }
