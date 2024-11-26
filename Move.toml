@@ -3,6 +3,7 @@ name = "warranty"
 edition = "2024.beta"
 license = "Apache 2.0"
 authors = ["Antonio Yang (yanganto@gmail.com)"]
+published-at = "0xd8af74987cedf2ab0b67ffc3349fc8f2503952270388ac3e300af13c3326c1a1"
 
 [dependencies]
 Sui = { git = "https://github.com/MystenLabs/sui.git", subdir = "crates/sui-framework/packages/sui-framework", rev = "framework/testnet" }

@@ -17,7 +17,7 @@ public struct Warranty has key, store {
     brand_owner: ID,
 }
 
-public struct BrandOwnerCap has key {
+public struct BrandOwnerCap has key, store {
     id: UID,
 }
 
@@ -102,7 +102,7 @@ public fun verify_card(
 }
 
 // === Admin Functions ===
-public fun issue(
+public entry fun issue(
     warranty: &Warranty,
     brand_owner_cap: &BrandOwnerCap,
     product_serise_number: String,
